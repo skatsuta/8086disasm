@@ -10,6 +10,8 @@ import (
 	"github.com/skatsuta/8086disasm/log"
 )
 
+const bsize = 2
+
 // Opcode represents operation code.
 type Opcode uint
 
@@ -83,8 +85,28 @@ func main() {
 	}
 }
 
-func modrm(b byte, r *bufio.Reader) (int, string, error) {
-	return 0, "", nil
+func modrm(b byte, r io.Reader) (string, error) {
+	mode := b >> 6 // [00]000000
+	rm := b & 0x7  // 00000[000]
+
+	switch mode {
+	case 0x0: // mode == 00
+		if rm == 0x6 { // rm == 110
+			p := make([]byte, bsize)
+			if _, e := r.Read(p); e != nil {
+				return "", fmt.Errorf("Reader#Read() failed: %v", e)
+			}
+		}
+		return regm[rm], nil
+	case 0x1: // mode == 01
+		// TODO: sign extended
+		return "", nil
+	case 0x2:
+		// TODO
+		return "", nil
+	default: // mod == 11
+		return reg16[rm], nil
+	}
 }
 
 func parse(b byte, r io.Reader) (string, error) {
