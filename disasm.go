@@ -7,35 +7,20 @@ import (
 	"io"
 	"os"
 
+	"github.com/skatsuta/8086disasm/asm"
 	"github.com/skatsuta/8086disasm/log"
 )
 
 const bsize = 2
 
-// Opcode represents operation code.
-type Opcode uint
-
-const (
-	_   Opcode = iota
-	inc        // INC
+var (
+	// 16-bit registers
+	reg16 = []string{"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"}
+	// effective addresses
+	regm = []string{"bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx"}
 )
 
-func opstr(op Opcode) string {
-	switch op {
-	case inc:
-		return "inc"
-	}
-	return ""
-}
-
-var data = []byte{0x40}
-
-// 16-bit registers
-var reg16 = []string{"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"}
-
-// effective addresses
-var regm = []string{"bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx"}
-
+// logger is a logging object.
 var logger log.Logger
 
 func init() {
@@ -137,9 +122,10 @@ func (da *Disasm) Parse() (string, error) {
 
 func (da *Disasm) parse(b byte) (string, error) {
 	switch {
-	case b>>3 == 0x8:
+	case b>>3 == 0x8: // 01000reg
 		reg := b & 0x7
-		return fmt.Sprintf("%08X  %02X\t\t%s %s", da.off, b, opstr(inc), reg16[reg]), nil
+		return asm.NewCmd(da.off, []byte{b}, "inc", false, reg16[reg], "").String(), nil
+		//return fmt.Sprintf("%08X  %02X\t\t\t%s %s", da.off, b, op.String(), reg16[reg]), nil
 	}
 	da.off++
 	return "", nil

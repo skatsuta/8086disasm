@@ -24,14 +24,21 @@ type Cmd struct {
 
 func (a *Cmd) String() string {
 	// byte or word instruction
-	size := "byte"
+	size := "byte "
 	if a.w {
-		size = "word"
+		size = "word "
 	}
 
-	return fmt.Sprintf("%08X %s %s %s", a.pos, size, a.opr1, a.opr2)
+	return fmt.Sprintf("%08X  %X %s %s %s%s,%s", a.pos, a.bin, a.opc, size, a.opr1, a.opr2)
 }
 
 func NewCmd(pos int, b bin, opc string, w bool, opr1, opr2 string) *Cmd {
-	return nil
+	return &Cmd{
+		pos:  pos,
+		bin:  b,
+		opc:  opc,
+		w:    w,
+		opr1: opr1,
+		opr2: opr2,
+	}
 }
