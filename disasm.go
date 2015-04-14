@@ -104,20 +104,23 @@ func parse(b byte, r io.Reader) (string, error) {
 
 // Disasm is a disassembler.
 type Disasm struct {
-	rd  io.Reader
-	wt  io.Writer
+	r   *bufio.Reader
+	w   io.Writer
 	off int // offset
+	c   byte
+	bs  []byte
 }
 
 // Parse parses a set of opcode and operand to an assembly operation.
-func (da *Disasm) Parse() (string, error) {
-	b := make([]byte, 1)
-
-	if _, e := da.rd.Read(b); e == io.EOF {
-		return "", e
+func (d *Disasm) Parse() (string, error) {
+	c, err := d.r.ReadByte()
+	if err == io.EOF {
+		return "", err
 	}
 
-	return da.parse(b[0])
+	d.c = c
+
+	return d.parse(d.c)
 }
 
 func (da *Disasm) parse(b byte) (string, error) {
@@ -132,10 +135,10 @@ func (da *Disasm) parse(b byte) (string, error) {
 }
 
 // NewDisasm returns a new Disasm.
-func NewDisasm(r io.Reader, w io.Writer) *Disasm {
+func NewDisasm(r *bufio.Reader, w io.Writer) *Disasm {
 	return &Disasm{
-		rd:  r,
-		wt:  w,
+		r:   r,
+		w:   w,
 		off: 0,
 	}
 }
