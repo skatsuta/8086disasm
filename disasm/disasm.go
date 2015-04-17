@@ -8,7 +8,7 @@ import (
 	"github.com/skatsuta/8086disasm/asm"
 )
 
-const bsize = 2
+const cmdLenMax = 3
 
 var (
 	// 16-bit registers
@@ -33,15 +33,22 @@ type Disasm struct {
 // NewDisasm returns a new Disasm.
 func NewDisasm(r *bufio.Reader, w io.Writer) *Disasm {
 	return &Disasm{
-		r: r,
-		w: w,
+		r:   r,
+		w:   w,
+		off: 0,
+		cmd: &command{
+			c:  0,
+			bs: make([]byte, 0, cmdLenMax),
+		},
 	}
 }
 
-func (d *Disasm) modrm() (string, error) {
-	b := d.cmd.c
-	bs := d.cmd.bs
-	r := d.r
+func modrm(bs []byte) (string, error) {
+	if len(bs) < 1 || len(bs) > cmdLenMax {
+		return "", fmt.Errorf("length of %v is invalid", bs)
+	}
+
+	b := bs[0]
 
 	mode := b >> 6 // [00]000000: upper two bits
 	rm := b & 0x7  // 00000[000]: lower three bits
@@ -49,16 +56,13 @@ func (d *Disasm) modrm() (string, error) {
 	switch mode {
 	case 0x0: // mode = 00
 		if rm == 0x6 { // rm = 110 ==> b = 00***110
-			if _, e := r.Read(bs); e != nil {
-				return "", fmt.Errorf("Read() failed: %v", e)
-			}
 			if len(bs) < 3 {
-				return "", fmt.Errorf("following bytes of %02X are too short", b)
+				return "", fmt.Errorf("r/m is 0x%x but bs is too short: %X", rm, bs)
 			}
 			s := fmt.Sprintf("[0x%02x%02x]", bs[2], bs[1])
 			return s, nil
 		}
-		return "[" + regm[rm] + "]", nil
+		return fmt.Sprintf("[%v]", regm[rm]), nil
 	case 0x1: // mode = 01
 		// TODO: sign extended
 		return "", nil
@@ -68,7 +72,7 @@ func (d *Disasm) modrm() (string, error) {
 	case 0x3: // mode = 11
 		return reg16[rm], nil
 	default:
-		return "", fmt.Errorf("mode = %v or r/m = %v is invalid", mode, rm)
+		return "", fmt.Errorf("either mode = %v or r/m = %v is invalid", mode, rm)
 	}
 }
 
