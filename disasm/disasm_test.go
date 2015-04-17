@@ -11,6 +11,10 @@ func TestModrmNomal(t *testing.T) {
 		{[]byte{0x00}, "[bx+si]"},
 		{[]byte{0x07}, "[bx]"},
 
+		// 01***r/m disp-low
+		{[]byte{0x40, 0x12}, "[bx+si+0x12]"},
+		{[]byte{0x47, 0xFF}, "[bx-0x1]"},
+
 		// 00***110 disp-high disp-low
 		{[]byte{0x06, 0x12, 0x34}, "[0x3412]"},
 

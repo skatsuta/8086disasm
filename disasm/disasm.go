@@ -56,16 +56,19 @@ func modrm(bs []byte) (string, error) {
 	switch mode {
 	case 0x0: // mode = 00
 		if rm == 0x6 { // rm = 110 ==> b = 00***110
-			if len(bs) < 3 {
-				return "", fmt.Errorf("r/m is 0x%x but bs is too short: %X", rm, bs)
+			if len(bs) != 3 {
+				return "", fmt.Errorf("r/m is %#x but %X doesn't have length 3", rm, bs)
 			}
 			s := fmt.Sprintf("[0x%02x%02x]", bs[2], bs[1])
 			return s, nil
 		}
 		return fmt.Sprintf("[%v]", regm[rm]), nil
 	case 0x1: // mode = 01
-		// TODO: sign extended
-		return "", nil
+		if len(bs) != 2 {
+			return "", fmt.Errorf("r/m is %#x but %X doesn't have length 2", rm, bs)
+		}
+		s := fmt.Sprintf("[%v%+#x]", regm[rm], int8(bs[1]))
+		return s, nil
 	case 0x2: // mode = 10
 		// TODO: disp = disp-high; disp-low
 		return "", nil
