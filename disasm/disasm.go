@@ -70,8 +70,13 @@ func modrm(bs []byte) (string, error) {
 		s := fmt.Sprintf("[%v%+#x]", regm[rm], int8(bs[1]))
 		return s, nil
 	case 0x2: // mode = 10
-		// TODO: disp = disp-high; disp-low
-		return "", nil
+		if len(bs) != 3 {
+			return "", fmt.Errorf("r/m is %#x but %X doesn't have length 3", rm, bs)
+		}
+		// little endian
+		disp := (int16(bs[2]) << 8) | int16(bs[1])
+		s := fmt.Sprintf("[%v%+#x]", regm[rm], disp)
+		return s, nil
 	case 0x3: // mode = 11
 		return reg16[rm], nil
 	default:
