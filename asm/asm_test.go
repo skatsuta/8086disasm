@@ -1,4 +1,4 @@
-package asm_test
+package disasm
 
 import (
 	. "github.com/onsi/ginkgo"

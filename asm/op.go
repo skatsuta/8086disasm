@@ -1,6 +1,6 @@
 //go:generate stringer -type=Opcode
 
-package asm
+package disasm
 
 // Opcode is an operation code.
 type Opcode int
