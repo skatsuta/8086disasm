@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-
-	"github.com/skatsuta/8086disasm/asm"
 )
 
 const cmdLenMax = 3
@@ -84,12 +82,17 @@ func modrm(bs []byte) (string, error) {
 	}
 }
 
-func parse(b byte, r io.Reader) (string, error) {
+func parse(b byte, r *bufio.Reader) (string, error) {
 	switch {
 	case b>>3 == 0x8:
-		return "inc: register", nil
+		reg := b & 0x7
+		return cmdStr(0, nil, inc, reg16[reg], ""), nil
 	}
 	return "", nil
+}
+
+func cmdStr(off int, bs []byte, opc Opcode, opr1, opr2 string) string {
+	return fmt.Sprintf("%08X  %02X\t\t\t%s %s%s", off, bs, opc.String(), opr1, opr2)
 }
 
 // Parse parses a set of opcode and operand to an assembly operation.
@@ -108,8 +111,7 @@ func (d *Disasm) parse(b byte) (string, error) {
 	switch {
 	case b>>3 == 0x8: // 01000reg
 		reg := b & 0x7
-		return asm.NewCmd(d.off, []byte{b}, "inc", false, reg16[reg], "").String(), nil
-		//return fmt.Sprintf("%08X  %02X\t\t\t%s %s", d.off, b, op.String(), reg16[reg]), nil
+		return cmdStr(d.off, []byte{b}, inc, reg16[reg], ""), nil
 	}
 	d.off++
 	return "", nil

@@ -3,22 +3,23 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"io"
 	"os"
 
-	"github.com/skatsuta/8086disasm/asm"
+	"github.com/skatsuta/8086disasm/disasm"
 	"github.com/skatsuta/8086disasm/log"
 )
 
 const bsize = 2
 
+/*
 var (
 	// 16-bit registers
 	reg16 = []string{"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"}
 	// effective addresses
 	regm = []string{"bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx"}
 )
+*/
 
 // logger is a logging object.
 var logger log.Logger
@@ -41,7 +42,7 @@ func main() {
 	//r := bytes.NewReader(data)
 	w := bufio.NewWriter(os.Stdout)
 
-	d := NewDisasm(r, w)
+	d := disasm.NewDisasm(r, w)
 
 	for {
 		s, err := d.Parse()
@@ -70,6 +71,7 @@ func main() {
 	}
 }
 
+/*
 func modrm(b byte, r io.Reader) (string, error) {
 	mode := b >> 6 // [00]000000
 	rm := b & 0x7  // 00000[000]
@@ -142,3 +144,4 @@ func NewDisasm(r *bufio.Reader, w io.Writer) *Disasm {
 		off: 0,
 	}
 }
+*/
