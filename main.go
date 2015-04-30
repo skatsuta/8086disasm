@@ -42,7 +42,7 @@ func main() {
 	//r := bytes.NewReader(data)
 	w := bufio.NewWriter(os.Stdout)
 
-	d := disasm.NewDisasm(r, w)
+	d := disasm.New(r, w)
 
 	for {
 		s, err := d.Parse()
