@@ -91,12 +91,14 @@ func modrm(bs []byte) (string, error) {
 	}
 }
 
+// modrmErr returns an error that may occur in modrm() function.
 func modrmErr(rm byte, bs []byte, l int) error {
 	return fmt.Errorf("r/m is %#x but %X does not have length %v", rm, bs, l)
 }
 
-func cmdStr(off int, bs []byte, opc Opcode, opr1, opr2 string) string {
-	return fmt.Sprintf("%08X  %02X\t\t\t%s %s%s", off, bs, opc.String(), opr1, opr2)
+// cmdStr returns an disassembled code.
+func cmdStr(off int, b byte, bs []byte, opc Opcode, w, opr1, opr2 string) string {
+	return fmt.Sprintf("%08X  %X%X   %s %s%s%s", off, b, bs, opc.String(), w, opr1, opr2)
 }
 
 // Parse parses a set of opcode and operand to an assembly operation.
@@ -108,22 +110,26 @@ func (d *Disasm) Parse() (string, error) {
 
 	d.cmd.c = c
 
-	// unread last byte to reread following bytes with slice
-	if e := d.rdr.UnreadByte(); e != nil {
-		return "", fmt.Errorf("UnreadByte() failed: %v", e)
-	}
-
 	return d.parse(d.cmd.c)
 }
 
 func (d *Disasm) parse(b byte) (string, error) {
 	switch {
-	case b>>3 == 0x8: // 01000reg
-		reg := b & 0x7
-		if _, e := d.rdr.Read(d.cmd.bs[:1]); e != nil {
+	case b>>1 == 0x7F: // 1111111w
+		d.offset += 4
+		d.cmd.bs = d.cmd.bs[:3]
+		if _, e := d.rdr.Read(d.cmd.bs); e != nil {
 			return "", fmt.Errorf("Read() failed: %v", e)
 		}
-		return cmdStr(d.offset, d.cmd.bs, inc, reg16[reg], ""), nil
+		opr, err := modrm(d.cmd.bs)
+		if err != nil {
+			return "", fmt.Errorf("modrm(%v) failed: %v", d.cmd.bs, err)
+		}
+		return cmdStr(d.offset, d.cmd.c, d.cmd.bs, inc, "word ", opr, ""), nil
+	case b>>3 == 0x8: // 01000reg
+		d.offset++
+		reg := b & 0x7
+		return cmdStr(d.offset, d.cmd.c, nil, inc, "", reg16[reg], ""), nil
 	}
 	d.offset++
 	return "", nil
