@@ -12,11 +12,11 @@ const maxLenFolInstCod = 3
 
 var (
 	// 8-bit registers
-	reg8 = []string{"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"}
+	reg8 = [...]string{"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"}
 	// 16-bit registers
-	reg16 = []string{"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"}
+	reg16 = [...]string{"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"}
 	// effective addresses
-	regm = []string{"bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx"}
+	regm = [...]string{"bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx"}
 )
 
 type command struct {
