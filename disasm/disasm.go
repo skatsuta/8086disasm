@@ -82,15 +82,6 @@ func modrm(bs []byte) (string, error) {
 	}
 }
 
-func parse(b byte, r *bufio.Reader) (string, error) {
-	switch {
-	case b>>3 == 0x8:
-		reg := b & 0x7
-		return cmdStr(0, nil, inc, reg16[reg], ""), nil
-	}
-	return "", nil
-}
-
 func cmdStr(off int, bs []byte, opc Opcode, opr1, opr2 string) string {
 	return fmt.Sprintf("%08X  %02X\t\t\t%s %s%s", off, bs, opc.String(), opr1, opr2)
 }
