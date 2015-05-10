@@ -15,6 +15,8 @@ var (
 	reg8 = [...]string{"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"}
 	// 16-bit registers
 	reg16 = [...]string{"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"}
+	// segment registers
+	sreg = [...]string{"es", "cs", "ss", "ds"}
 	// effective addresses
 	regm = [...]string{"bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx"}
 )
