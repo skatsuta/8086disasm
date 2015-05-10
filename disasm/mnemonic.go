@@ -1,13 +1,13 @@
-//go:generate stringer -type=Opcode
+//go:generate stringer -type=Mnemonic
 
 package disasm
 
-// Opcode is an operation code.
-type Opcode int
+// Mnemonic is an operation code.
+type Mnemonic int
 
-// Opcodes.
+// Mnemonics.
 const (
-	_ Opcode = iota
+	_ Mnemonic = iota
 
 	// Data Transfer
 	mov   // move

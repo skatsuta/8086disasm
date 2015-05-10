@@ -2,6 +2,7 @@ package disasm
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 )
@@ -99,7 +100,7 @@ func modrmErr(rm byte, bs []byte, l int) error {
 }
 
 // cmdStr returns an disassembled code.
-func cmdStr(off int, b byte, bs []byte, opc Opcode, w, opr1, opr2 string) string {
+func cmdStr(off int, b byte, bs []byte, opc Mnemonic, w, opr1, opr2 string) string {
 	return fmt.Sprintf("%08X  %X%X   %s %s%s%s", off, b, bs, opc.String(), w, opr1, opr2)
 }
 
@@ -135,4 +136,85 @@ func (d *Disasm) parse(b byte) (string, error) {
 	}
 	d.offset++
 	return "", nil
+}
+
+type comProp struct {
+	op  Mnemonic
+	l   int
+	d   byte
+	w   byte
+	reg byte
+}
+
+func (c *comProp) parseOp(bs []byte) error {
+	if len(bs) != 2 {
+		return errors.New("parseOp: the length of argument must be 2")
+	}
+
+	b := bs[0]
+
+	switch {
+	// add
+	case b>>2 == 0x0:
+		c.op = add
+		c.l = 2
+		c.d = getd(b)
+		c.w = getw(b)
+	case b>>1 == 0x2:
+		c.op = add
+		c.w = getw(b)
+		c.l = int(c.w + 1)
+	// push
+	case b&0xE7 == 0x6:
+		c.op = push
+		c.l = 1
+		c.reg = b >> 3 & 0x3
+	// pop
+	case b&0xE7 == 0x7:
+		c.op = pop
+		c.l = 1
+		c.reg = b >> 3 & 0x3
+	// or
+	case b>>2 == 0x2:
+		c.op = or
+		c.l = 2
+		c.d = getd(b)
+		c.w = getw(b)
+	case b>>1 == 0x6:
+		c.op = or
+		c.l = int(c.w + 1)
+		c.w = getw(b)
+	// adc
+	case b>>2 == 0x4:
+		c.op = adc
+		c.l = 2
+		c.d = getd(b)
+		c.w = getw(b)
+	// sbb
+	case b>>2 == 0x6:
+		c.op = sbb
+		c.l = 2
+		c.d = getd(b)
+		c.w = getd(b)
+	case b>>1 == 0x7:
+		c.op = sbb
+		c.l = int(c.w + 1)
+		c.w = getw(b)
+	// sub
+	case b>>2 == 0xA:
+		c.op = sub
+		c.l = 2
+		c.d = getd(b)
+		c.w = getd(b)
+
+	}
+	return nil
+}
+
+func getd(b byte) byte {
+	return (b >> 1) & 0x1
+}
+
+func getw(b byte) byte {
+	return b & 0x1
 }
