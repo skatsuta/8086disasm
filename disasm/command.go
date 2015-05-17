@@ -119,6 +119,27 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = xor
 		c.w = getw(b)
 		c.l = int(c.w + 1)
+
+	// aaa
+	case b == 0x37:
+		c.mnem = aaa
+		c.l = 1
+
+	// cmp
+	case b>>2 == 0xE:
+		c.mnem = cmp
+		c.l = 2
+		c.d = getd(b)
+		c.w = getw(b)
+	case b>>1 == 0x1E:
+		c.mnem = cmp
+		c.w = getw(b)
+		c.l = int(c.w + 1)
+
+	// aas
+	case b == 0x3F:
+		c.mnem = aas
+		c.l = 1
 	}
 	return nil
 }
