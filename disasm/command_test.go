@@ -8,13 +8,19 @@ import (
 func TestParseOpcode(t *testing.T) {
 	modrmTests := []struct {
 		bs   []byte
-		want command
+		want *command
 	}{
 		// add
-		{[]byte{0x0, 0x0}, command{nil, add, 2, 0, 0, 0}},
-		{[]byte{0x1, 0x0}, command{nil, add, 2, 0, 0, 1}},
-		{[]byte{0x2, 0x0}, command{nil, add, 2, 0, 1, 0}},
-		{[]byte{0x3, 0x0}, command{nil, add, 2, 0, 1, 1}},
+		{[]byte{0x0, 0x0}, &command{bs: nil, mnem: add, l: 2, d: 0, w: 0, reg: 0}},
+		{[]byte{0x1, 0x0}, &command{bs: nil, mnem: add, l: 2, d: 0, w: 1, reg: 0}},
+		{[]byte{0x2, 0x0}, &command{bs: nil, mnem: add, l: 2, d: 1, w: 0, reg: 0}},
+		{[]byte{0x3, 0x0}, &command{bs: nil, mnem: add, l: 2, d: 1, w: 1, reg: 0}},
+		{[]byte{0x4, 0x0}, &command{bs: nil, mnem: add, l: 1, d: 0, w: 0, reg: 0}},
+		{[]byte{0x5, 0x0}, &command{bs: nil, mnem: add, l: 2, d: 0, w: 1, reg: 0}},
+		// push
+		{[]byte{0x6, 0x0}, &command{bs: nil, mnem: push, l: 1, d: 0, w: 0, reg: 0}},
+		// pop
+		{[]byte{0x7, 0x0}, &command{bs: nil, mnem: pop, l: 1, d: 0, w: 0, reg: 0}},
 	}
 
 	got := &command{}
@@ -24,7 +30,7 @@ func TestParseOpcode(t *testing.T) {
 		if err != nil {
 			t.Errorf("%v", err)
 		}
-		if reflect.DeepEqual(got, tt.want) {
+		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("got %v; want %v", got, tt.want)
 		}
 	}
