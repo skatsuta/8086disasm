@@ -77,13 +77,6 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.w = getw(b)
 		c.l = int(c.w + 1)
 
-	// sub
-	case b>>2 == 0xA:
-		c.mnem = sub
-		c.l = 2
-		c.d = getd(b)
-		c.w = getw(b)
-
 	// and
 	case b>>2 == 0x8:
 		c.mnem = and
@@ -99,6 +92,17 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b == 0x27:
 		c.mnem = daa
 		c.l = 1
+
+	// sub
+	case b>>2 == 0xA:
+		c.mnem = sub
+		c.l = 2
+		c.d = getd(b)
+		c.w = getw(b)
+	case b>>1 == 0x16:
+		c.mnem = sub
+		c.w = getw(b)
+		c.l = int(c.w + 1)
 	}
 	return nil
 }
