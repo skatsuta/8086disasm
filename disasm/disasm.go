@@ -2,7 +2,6 @@ package disasm
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 )
@@ -10,6 +9,9 @@ import (
 // maxLenFolInstCod is the maximum length of bytes of an insruction code
 // that follows the opcode.
 const maxLenFolInstCod = 3
+
+// numBytesPeeked is the number of bytes that are peeked to be interpreted.
+const numBytesPeeked = 2
 
 var (
 	// 8-bit registers
@@ -22,6 +24,7 @@ var (
 	regm = [...]string{"bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx"}
 )
 
+/*
 type command struct {
 	c    byte
 	bs   []byte
@@ -31,6 +34,7 @@ type command struct {
 	w    byte
 	reg  byte
 }
+*/
 
 // Disasm is a disassembler.
 type Disasm struct {
@@ -47,7 +51,6 @@ func New(r *bufio.Reader, w io.Writer) *Disasm {
 		wtr:    w,
 		offset: 0,
 		cmd: &command{
-			c:  0,
 			bs: make([]byte, 1, maxLenFolInstCod),
 		},
 	}
@@ -105,20 +108,21 @@ func modrmErr(rm byte, bs []byte, l int) error {
 }
 
 // cmdStr returns an disassembled code.
-func cmdStr(off int, b byte, bs []byte, opc Mnemonic, w, opr1, opr2 string) string {
-	return fmt.Sprintf("%08X  %X%X   %s %s%s%s", off, b, bs, opc.String(), w, opr1, opr2)
+func cmdStr(off int, bs []byte, mnem Mnemonic, w, opr1, opr2 string) string {
+	return fmt.Sprintf("%08X  %X   %s %s%s%s", off, bs, mnem.String(), w, opr1, opr2)
 }
 
 // Parse parses a set of opcode and operand to an assembly operation.
 func (d *Disasm) Parse() (string, error) {
-	c, err := d.rdr.ReadByte()
+	bs, err := d.rdr.Peek(numBytesPeeked)
 	if err == io.EOF {
 		return "", err
 	}
 
-	d.cmd.c = c
+	d.cmd.bs = bs
 
-	return d.parse(d.cmd.c)
+	//return d.parse(d.cmd.bs)
+	return "", nil
 }
 
 func (d *Disasm) parse(b byte) (string, error) {
@@ -133,16 +137,17 @@ func (d *Disasm) parse(b byte) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("modrm(%v) failed: %v", d.cmd.bs, err)
 		}
-		return cmdStr(d.offset, d.cmd.c, d.cmd.bs, inc, "word ", opr, ""), nil
+		return cmdStr(d.offset, d.cmd.bs, inc, "word ", opr, ""), nil
 	case b>>3 == 0x8: // 01000reg
 		d.offset++
 		reg := b & 0x7
-		return cmdStr(d.offset, d.cmd.c, nil, inc, "", reg16[reg], ""), nil
+		return cmdStr(d.offset, nil, inc, "", reg16[reg], ""), nil
 	}
 	d.offset++
 	return "", nil
 }
 
+/*
 type comProp struct {
 	op  Mnemonic
 	l   int
@@ -233,3 +238,4 @@ func (c *command) init() {
 	c.w = 0
 	c.reg = 0
 }
+*/
