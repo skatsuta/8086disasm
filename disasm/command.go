@@ -94,6 +94,11 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = and
 		c.w = getw(b)
 		c.l = int(c.w + 1)
+
+	// daa
+	case b == 0x27:
+		c.mnem = daa
+		c.l = 1
 	}
 	return nil
 }
