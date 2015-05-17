@@ -31,16 +31,19 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = add
 		c.w = getw(b)
 		c.l = int(c.w + 1)
+
 	// push
 	case b&0xE7 == 0x6:
 		c.mnem = push
 		c.l = 1
 		c.reg = b >> 3 & 0x3
+
 	// pop
 	case b&0xE7 == 0x7:
 		c.mnem = pop
 		c.l = 1
 		c.reg = b >> 3 & 0x3
+
 	// or
 	case b>>2 == 0x2:
 		c.mnem = or
@@ -51,12 +54,18 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = or
 		c.w = getw(b)
 		c.l = int(c.w + 1)
+
 	// adc
 	case b>>2 == 0x4:
 		c.mnem = adc
 		c.l = 2
 		c.d = getd(b)
 		c.w = getw(b)
+	case b>>1 == 0xA:
+		c.mnem = adc
+		c.w = getw(b)
+		c.l = int(c.w + 1)
+
 	// sbb
 	case b>>2 == 0x6:
 		c.mnem = sbb
@@ -65,8 +74,9 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.w = getd(b)
 	case b>>1 == 0x7:
 		c.mnem = sbb
-		c.l = int(c.w + 1)
 		c.w = getw(b)
+		c.l = int(c.w + 1)
+
 	// sub
 	case b>>2 == 0xA:
 		c.mnem = sub
@@ -87,6 +97,7 @@ func getw(b byte) byte {
 }
 
 func (c *command) init() {
+	c.bs = nil
 	c.mnem = 0
 	c.l = 0
 	c.d = 0
