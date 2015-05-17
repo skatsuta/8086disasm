@@ -8,7 +8,7 @@ type command struct {
 	l    int
 	d    byte
 	w    byte
-	reg  byte
+	reg  Reg
 }
 
 func (c *command) parseOpcode(bs []byte) error {
@@ -36,13 +36,13 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b&0xE7 == 0x6:
 		c.mnem = push
 		c.l = 1
-		c.reg = b >> 3 & 0x3
+		c.reg = Sreg(b >> 3 & 0x3)
 
 	// pop
 	case b&0xE7 == 0x7:
 		c.mnem = pop
 		c.l = 1
-		c.reg = b >> 3 & 0x3
+		c.reg = Sreg(b >> 3 & 0x3)
 
 	// or
 	case b>>2 == 0x2:
@@ -71,8 +71,8 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = sbb
 		c.l = 2
 		c.d = getd(b)
-		c.w = getd(b)
-	case b>>1 == 0x7:
+		c.w = getw(b)
+	case b>>1 == 0xE:
 		c.mnem = sbb
 		c.w = getw(b)
 		c.l = int(c.w + 1)
@@ -102,5 +102,5 @@ func (c *command) init() {
 	c.l = 0
 	c.d = 0
 	c.w = 0
-	c.reg = 0
+	c.reg = nil
 }

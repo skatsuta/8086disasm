@@ -1,7 +1,11 @@
 package disasm
 
+type Reg interface {
+	String() string
+}
+
 // Reg8 is an 8-bit register.
-type Reg8 int
+type Reg8 byte
 
 //go:generate stringer -type=Reg8
 const (
@@ -16,7 +20,7 @@ const (
 )
 
 // Reg16 is a 16-bit register.
-type Reg16 int
+type Reg16 byte
 
 //go:generate stringer -type=Reg16
 const (
@@ -31,7 +35,7 @@ const (
 )
 
 // Sreg is a segment register.
-type Sreg int
+type Sreg byte
 
 //go:generate stringer -type=Sreg
 const (
