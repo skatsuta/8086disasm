@@ -22,10 +22,12 @@ func TestParseOpcode(t *testing.T) {
 		{[]byte{0x06, 0x0}, &command{mnem: push, l: 1, d: 0, w: 0, reg: es}},
 		{[]byte{0x0E, 0x0}, &command{mnem: push, l: 1, d: 0, w: 0, reg: cs}},
 		{[]byte{0x16, 0x0}, &command{mnem: push, l: 1, d: 0, w: 0, reg: ss}},
+		{[]byte{0x1E, 0x0}, &command{mnem: push, l: 1, d: 0, w: 0, reg: ds}},
 
 		// pop
 		{[]byte{0x07, 0x0}, &command{mnem: pop, l: 1, d: 0, w: 0, reg: es}},
 		{[]byte{0x17, 0x0}, &command{mnem: pop, l: 1, d: 0, w: 0, reg: ss}},
+		{[]byte{0x1F, 0x0}, &command{mnem: pop, l: 1, d: 0, w: 0, reg: ds}},
 
 		// or
 		{[]byte{0x08, 0x0}, &command{mnem: or, l: 2, d: 0, w: 0}},
@@ -50,6 +52,14 @@ func TestParseOpcode(t *testing.T) {
 		{[]byte{0x1B, 0x0}, &command{mnem: sbb, l: 2, d: 1, w: 1}},
 		{[]byte{0x1C, 0x0}, &command{mnem: sbb, l: 1, d: 0, w: 0}},
 		{[]byte{0x1D, 0x0}, &command{mnem: sbb, l: 2, d: 0, w: 1}},
+
+		// and
+		{[]byte{0x20, 0x0}, &command{mnem: and, l: 2, d: 0, w: 0}},
+		{[]byte{0x21, 0x0}, &command{mnem: and, l: 2, d: 0, w: 1}},
+		{[]byte{0x22, 0x0}, &command{mnem: and, l: 2, d: 1, w: 0}},
+		{[]byte{0x23, 0x0}, &command{mnem: and, l: 2, d: 1, w: 1}},
+		{[]byte{0x24, 0x0}, &command{mnem: and, l: 1, d: 0, w: 0}},
+		{[]byte{0x25, 0x0}, &command{mnem: and, l: 2, d: 0, w: 1}},
 	}
 
 	got := &command{}

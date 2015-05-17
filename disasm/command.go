@@ -82,8 +82,18 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = sub
 		c.l = 2
 		c.d = getd(b)
-		c.w = getd(b)
+		c.w = getw(b)
 
+	// and
+	case b>>2 == 0x8:
+		c.mnem = and
+		c.l = 2
+		c.d = getd(b)
+		c.w = getw(b)
+	case b>>1 == 0x12:
+		c.mnem = and
+		c.w = getw(b)
+		c.l = int(c.w + 1)
 	}
 	return nil
 }
