@@ -71,6 +71,17 @@ func TestParseOpcode(t *testing.T) {
 		{[]byte{0x2B, 0x0}, &command{mnem: sub, l: 2, d: 1, w: 1}},
 		{[]byte{0x2C, 0x0}, &command{mnem: sub, l: 1, d: 0, w: 0}},
 		{[]byte{0x2D, 0x0}, &command{mnem: sub, l: 2, d: 0, w: 1}},
+
+		// das
+		{[]byte{0x2F, 0x0}, &command{mnem: das, l: 1}},
+
+		// xor
+		{[]byte{0x30, 0x0}, &command{mnem: xor, l: 2, d: 0, w: 0}},
+		{[]byte{0x31, 0x0}, &command{mnem: xor, l: 2, d: 0, w: 1}},
+		{[]byte{0x32, 0x0}, &command{mnem: xor, l: 2, d: 1, w: 0}},
+		{[]byte{0x33, 0x0}, &command{mnem: xor, l: 2, d: 1, w: 1}},
+		{[]byte{0x34, 0x0}, &command{mnem: xor, l: 1, d: 0, w: 0}},
+		{[]byte{0x35, 0x0}, &command{mnem: xor, l: 2, d: 0, w: 1}},
 	}
 
 	got := &command{}

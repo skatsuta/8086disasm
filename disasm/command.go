@@ -103,6 +103,22 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = sub
 		c.w = getw(b)
 		c.l = int(c.w + 1)
+
+	// das
+	case b == 0x2F:
+		c.mnem = das
+		c.l = 1
+
+	// xor
+	case b>>2 == 0xC:
+		c.mnem = xor
+		c.l = 2
+		c.d = getd(b)
+		c.w = getw(b)
+	case b>>1 == 0x1A:
+		c.mnem = xor
+		c.w = getw(b)
+		c.l = int(c.w + 1)
 	}
 	return nil
 }
