@@ -49,8 +49,8 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.w = getw(b)
 	case b>>1 == 0x6:
 		c.mnem = or
-		c.l = int(c.w + 1)
 		c.w = getw(b)
+		c.l = int(c.w + 1)
 	// adc
 	case b>>2 == 0x4:
 		c.mnem = adc
