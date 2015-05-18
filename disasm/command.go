@@ -37,12 +37,20 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = push
 		c.l = 1
 		c.reg = Sreg(b >> 3 & 0x3)
+	case b>>3 == 0xA:
+		c.mnem = push
+		c.l = 1
+		c.reg = Reg16(b & 0x7)
 
 	// pop
 	case b&0xE7 == 0x7:
 		c.mnem = pop
 		c.l = 1
 		c.reg = Sreg(b >> 3 & 0x3)
+	case b>>3 == 0xB:
+		c.mnem = pop
+		c.l = 1
+		c.reg = Reg16(b & 0x7)
 
 	// or
 	case b>>2 == 0x2:
