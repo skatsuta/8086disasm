@@ -140,6 +140,18 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b == 0x3F:
 		c.mnem = aas
 		c.l = 1
+
+	// inc
+	case b>>3 == 0x8:
+		c.mnem = inc
+		c.l = 1
+		c.reg = Reg16(b & 0x7)
+
+	// dec
+	case b>>3 == 0x9:
+		c.mnem = dec
+		c.l = 1
+		c.reg = Reg16(b & 0x7)
 	}
 	return nil
 }

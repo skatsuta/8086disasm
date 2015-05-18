@@ -96,6 +96,26 @@ func TestParseOpcode(t *testing.T) {
 
 		// aas
 		{[]byte{0x3F, 0x0}, &command{mnem: aas, l: 1}},
+
+		// inc
+		{[]byte{0x40, 0x0}, &command{mnem: inc, l: 1, reg: ax}},
+		{[]byte{0x41, 0x0}, &command{mnem: inc, l: 1, reg: cx}},
+		{[]byte{0x42, 0x0}, &command{mnem: inc, l: 1, reg: dx}},
+		{[]byte{0x43, 0x0}, &command{mnem: inc, l: 1, reg: bx}},
+		{[]byte{0x44, 0x0}, &command{mnem: inc, l: 1, reg: sp}},
+		{[]byte{0x45, 0x0}, &command{mnem: inc, l: 1, reg: bp}},
+		{[]byte{0x46, 0x0}, &command{mnem: inc, l: 1, reg: si}},
+		{[]byte{0x47, 0x0}, &command{mnem: inc, l: 1, reg: di}},
+
+		// dec
+		{[]byte{0x48, 0x0}, &command{mnem: dec, l: 1, reg: ax}},
+		{[]byte{0x49, 0x0}, &command{mnem: dec, l: 1, reg: cx}},
+		{[]byte{0x4A, 0x0}, &command{mnem: dec, l: 1, reg: dx}},
+		{[]byte{0x4B, 0x0}, &command{mnem: dec, l: 1, reg: bx}},
+		{[]byte{0x4C, 0x0}, &command{mnem: dec, l: 1, reg: sp}},
+		{[]byte{0x4D, 0x0}, &command{mnem: dec, l: 1, reg: bp}},
+		{[]byte{0x4E, 0x0}, &command{mnem: dec, l: 1, reg: si}},
+		{[]byte{0x4F, 0x0}, &command{mnem: dec, l: 1, reg: di}},
 	}
 
 	got := &command{}
