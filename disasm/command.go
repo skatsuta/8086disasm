@@ -7,6 +7,7 @@ type command struct {
 	mnem Mnemonic
 	l    int
 	d    byte
+	s    byte
 	w    byte
 	reg  Reg
 }
@@ -25,7 +26,7 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b>>2 == 0x0:
 		c.mnem = add
 		c.l = 2
-		c.d = getd(b)
+		c.d = getds(b)
 		c.w = getw(b)
 	case b>>1 == 0x2:
 		c.mnem = add
@@ -56,7 +57,7 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b>>2 == 0x2:
 		c.mnem = or
 		c.l = 2
-		c.d = getd(b)
+		c.d = getds(b)
 		c.w = getw(b)
 	case b>>1 == 0x6:
 		c.mnem = or
@@ -67,7 +68,7 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b>>2 == 0x4:
 		c.mnem = adc
 		c.l = 2
-		c.d = getd(b)
+		c.d = getds(b)
 		c.w = getw(b)
 	case b>>1 == 0xA:
 		c.mnem = adc
@@ -78,7 +79,7 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b>>2 == 0x6:
 		c.mnem = sbb
 		c.l = 2
-		c.d = getd(b)
+		c.d = getds(b)
 		c.w = getw(b)
 	case b>>1 == 0xE:
 		c.mnem = sbb
@@ -89,7 +90,7 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b>>2 == 0x8:
 		c.mnem = and
 		c.l = 2
-		c.d = getd(b)
+		c.d = getds(b)
 		c.w = getw(b)
 	case b>>1 == 0x12:
 		c.mnem = and
@@ -105,7 +106,7 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b>>2 == 0xA:
 		c.mnem = sub
 		c.l = 2
-		c.d = getd(b)
+		c.d = getds(b)
 		c.w = getw(b)
 	case b>>1 == 0x16:
 		c.mnem = sub
@@ -121,7 +122,7 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b>>2 == 0xC:
 		c.mnem = xor
 		c.l = 2
-		c.d = getd(b)
+		c.d = getds(b)
 		c.w = getw(b)
 	case b>>1 == 0x1A:
 		c.mnem = xor
@@ -137,7 +138,7 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b>>2 == 0xE:
 		c.mnem = cmp
 		c.l = 2
-		c.d = getd(b)
+		c.d = getds(b)
 		c.w = getw(b)
 	case b>>1 == 0x1E:
 		c.mnem = cmp
@@ -160,11 +161,36 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = dec
 		c.l = 1
 		c.reg = Reg16(b & 0x7)
+
+	// extensions
+	case b>>2 == 0x20:
+		ext := bs[1] >> 3 & 0x7
+		switch ext {
+		case 0x0:
+			c.mnem = add
+		case 0x1:
+			c.mnem = or
+		case 0x2:
+			c.mnem = adc
+		case 0x3:
+			c.mnem = sbb
+		case 0x4:
+			c.mnem = and
+		case 0x5:
+			c.mnem = sub
+		case 0x6:
+			c.mnem = xor
+		case 0x7:
+			c.mnem = cmp
+		}
+		c.w = getw(b)
+		c.s = getds(b)
+		c.l = int(3 + c.w - c.s)
 	}
 	return nil
 }
 
-func getd(b byte) byte {
+func getds(b byte) byte {
 	return (b >> 1) & 0x1
 }
 
@@ -177,6 +203,7 @@ func (c *command) init() {
 	c.mnem = 0
 	c.l = 0
 	c.d = 0
+	c.s = 0
 	c.w = 0
 	c.reg = nil
 }
