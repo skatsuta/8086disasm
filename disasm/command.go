@@ -186,7 +186,20 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.w = getw(b)
 		c.s = getds(b)
 		c.l = int(3 + c.w - c.s)
+
+	// test
+	case b>>1 == 0x42:
+		c.mnem = test
+		c.l = 2
+		c.w = getw(b)
+
+	// xchg
+	case b>>1 == 0x43:
+		c.mnem = xchg
+		c.l = 2
+		c.w = getw(b)
 	}
+
 	return nil
 }
 

@@ -156,6 +156,14 @@ func TestParseOpcode(t *testing.T) {
 		{[]byte{0x4D, 0x00}, &command{mnem: dec, l: 1, reg: bp}},
 		{[]byte{0x4E, 0x00}, &command{mnem: dec, l: 1, reg: si}},
 		{[]byte{0x4F, 0x00}, &command{mnem: dec, l: 1, reg: di}},
+
+		// test
+		{[]byte{0x84, 0x00}, &command{mnem: test, l: 2, w: 0}},
+		{[]byte{0x85, 0x00}, &command{mnem: test, l: 2, w: 1}},
+
+		// xchg
+		{[]byte{0x86, 0x00}, &command{mnem: xchg, l: 2, w: 0}},
+		{[]byte{0x87, 0x00}, &command{mnem: xchg, l: 2, w: 1}},
 	}
 
 	got := &command{}
