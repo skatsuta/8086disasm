@@ -9,7 +9,7 @@ build:
     - setup-go-workspace
 
     # Check the project source files
-    - wercker/golint
+    #- wercker/golint
 
     # Gets the dependencies
     - script:
