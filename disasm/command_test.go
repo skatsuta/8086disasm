@@ -47,6 +47,7 @@ func TestParseOpcode(t *testing.T) {
 		{[]byte{0x5D, 0x00}, &command{mnem: pop, l: 1, reg: bp}},
 		{[]byte{0x5E, 0x00}, &command{mnem: pop, l: 1, reg: si}},
 		{[]byte{0x5F, 0x00}, &command{mnem: pop, l: 1, reg: di}},
+		{[]byte{0x8F, 0x00}, &command{mnem: pop, l: 2}},
 
 		// or
 		{[]byte{0x08, 0x00}, &command{mnem: or, l: 2, d: 0, w: 0}},
@@ -164,12 +165,30 @@ func TestParseOpcode(t *testing.T) {
 		// xchg
 		{[]byte{0x86, 0x00}, &command{mnem: xchg, l: 2, w: 0}},
 		{[]byte{0x87, 0x00}, &command{mnem: xchg, l: 2, w: 1}},
+		{[]byte{0x91, 0x00}, &command{mnem: xchg, l: 1, reg: cx}},
+		{[]byte{0x92, 0x00}, &command{mnem: xchg, l: 1, reg: dx}},
+		{[]byte{0x93, 0x00}, &command{mnem: xchg, l: 1, reg: bx}},
+		{[]byte{0x94, 0x00}, &command{mnem: xchg, l: 1, reg: sp}},
+		{[]byte{0x95, 0x00}, &command{mnem: xchg, l: 1, reg: bp}},
+		{[]byte{0x96, 0x00}, &command{mnem: xchg, l: 1, reg: si}},
+		{[]byte{0x97, 0x00}, &command{mnem: xchg, l: 1, reg: di}},
 
 		// mov
 		{[]byte{0x88, 0x00}, &command{mnem: mov, l: 2, d: 0, w: 0}},
 		{[]byte{0x89, 0x00}, &command{mnem: mov, l: 2, d: 0, w: 1}},
 		{[]byte{0x8A, 0x00}, &command{mnem: mov, l: 2, d: 1, w: 0}},
 		{[]byte{0x8B, 0x00}, &command{mnem: mov, l: 2, d: 1, w: 1}},
+		{[]byte{0x8C, 0x00}, &command{mnem: mov, l: 2}},
+		{[]byte{0x8E, 0x00}, &command{mnem: mov, l: 2}},
+
+		// lea
+		{[]byte{0x8D, 0x00}, &command{mnem: lea, l: 2}},
+
+		// cbw
+		{[]byte{0x98, 0x00}, &command{mnem: cbw, l: 1}},
+
+		// cwd
+		{[]byte{0x99, 0x00}, &command{mnem: cwd, l: 1}},
 	}
 
 	got := &command{}
@@ -180,7 +199,7 @@ func TestParseOpcode(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("got %+v; want %+v", got, tt.want)
+			t.Errorf("on %X: got %+v; want %+v", tt.bs, got, tt.want)
 		}
 	}
 }

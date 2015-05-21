@@ -12,6 +12,13 @@ type command struct {
 	reg  Reg
 }
 
+/*
+func (c *command) String() string {
+	return fmt.Sprintf("&{bs:%v mnem:%v l:%v d:%v s:%v w:%v reg:%v}",
+		c.bs, c.mnem.String(), c.l, c.d, c.s, c.w, c.reg.String())
+}
+*/
+
 func (c *command) parseOpcode(bs []byte) error {
 	c.init()
 
@@ -52,6 +59,9 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = pop
 		c.l = 1
 		c.reg = Reg16(b & 0x7)
+	case b == 0x8F:
+		c.mnem = pop
+		c.l = 2
 
 	// or
 	case b>>2 == 0x2:
@@ -198,6 +208,10 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = xchg
 		c.l = 2
 		c.w = getw(b)
+	case b>>3 == 0x12:
+		c.mnem = xchg
+		c.l = 1
+		c.reg = Reg16(b & 0x7)
 
 	// mov
 	case b>>2 == 0x22:
@@ -205,6 +219,24 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.l = 2
 		c.d = getds(b)
 		c.w = getw(b)
+	case b == 0x8C, b == 0x8E:
+		c.mnem = mov
+		c.l = 2
+
+	// lea
+	case b == 0x8D:
+		c.mnem = lea
+		c.l = 2
+
+	// cbw
+	case b == 0x98:
+		c.mnem = cbw
+		c.l = 1
+
+	// cwd
+	case b == 0x99:
+		c.mnem = cwd
+		c.l = 1
 	}
 
 	return nil
