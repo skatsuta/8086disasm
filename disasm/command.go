@@ -198,6 +198,13 @@ func (c *command) parseOpcode(bs []byte) error {
 		c.mnem = xchg
 		c.l = 2
 		c.w = getw(b)
+
+	// mov
+	case b>>2 == 0x22:
+		c.mnem = mov
+		c.l = 2
+		c.d = getds(b)
+		c.w = getw(b)
 	}
 
 	return nil
