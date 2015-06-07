@@ -180,6 +180,10 @@ func TestParseOpcode(t *testing.T) {
 		{[]byte{0x8B, 0x00}, &command{mnem: mov, l: 2, d: 1, w: 1}},
 		{[]byte{0x8C, 0x00}, &command{mnem: mov, l: 2}},
 		{[]byte{0x8E, 0x00}, &command{mnem: mov, l: 2}},
+		{[]byte{0xA0, 0x00}, &command{mnem: mov, l: 3, d: 0, w: 0, reg: al}},
+		{[]byte{0xA1, 0x00}, &command{mnem: mov, l: 3, d: 0, w: 1, reg: ax}},
+		{[]byte{0xA2, 0x00}, &command{mnem: mov, l: 3, d: 1, w: 0, reg: al}},
+		{[]byte{0xA3, 0x00}, &command{mnem: mov, l: 3, d: 1, w: 1, reg: ax}},
 
 		// lea
 		{[]byte{0x8D, 0x00}, &command{mnem: lea, l: 2}},
@@ -189,6 +193,21 @@ func TestParseOpcode(t *testing.T) {
 
 		// cwd
 		{[]byte{0x99, 0x00}, &command{mnem: cwd, l: 1}},
+
+		// wait
+		{[]byte{0x9B, 0x00}, &command{mnem: wait, l: 1}},
+
+		// pushf
+		{[]byte{0x9C, 0x00}, &command{mnem: pushf, l: 1}},
+
+		// popf
+		{[]byte{0x9D, 0x00}, &command{mnem: popf, l: 1}},
+
+		// sahf
+		{[]byte{0x9E, 0x00}, &command{mnem: sahf, l: 1}},
+
+		// lahf
+		{[]byte{0x9F, 0x00}, &command{mnem: lahf, l: 1}},
 	}
 
 	got := &command{}

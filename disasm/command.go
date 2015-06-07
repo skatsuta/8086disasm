@@ -222,6 +222,16 @@ func (c *command) parseOpcode(bs []byte) error {
 	case b == 0x8C, b == 0x8E:
 		c.mnem = mov
 		c.l = 2
+	case b>>2 == 0x28:
+		c.mnem = mov
+		c.l = 3
+		c.d = getds(b)
+		c.w = getw(b)
+		if c.w == 0 {
+			c.reg = Reg8(0)
+		} else {
+			c.reg = Reg16(0)
+		}
 
 	// lea
 	case b == 0x8D:
@@ -236,6 +246,31 @@ func (c *command) parseOpcode(bs []byte) error {
 	// cwd
 	case b == 0x99:
 		c.mnem = cwd
+		c.l = 1
+
+	// wait
+	case b == 0x9B:
+		c.mnem = wait
+		c.l = 1
+
+	// pushf
+	case b == 0x9C:
+		c.mnem = pushf
+		c.l = 1
+
+	// popf
+	case b == 0x9D:
+		c.mnem = popf
+		c.l = 1
+
+	// sahf
+	case b == 0x9E:
+		c.mnem = sahf
+		c.l = 1
+
+	// lahf
+	case b == 0x9F:
+		c.mnem = lahf
 		c.l = 1
 	}
 
